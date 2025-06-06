@@ -43,7 +43,11 @@ class Signup(SwaggerViewMixin, APIView):
 
         serializer = self.get_serializer_by_role(role)
 
-        s = serializer(data=request.data)
+        data = request.data.copy()
+        data['role'] = role
+        data['is_active'] = True
+
+        s = serializer(data=data)
         s.is_valid(raise_exception=True)
         user = s.save()
         tokens = RefreshToken.for_user(user)

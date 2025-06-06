@@ -127,7 +127,7 @@ API_URL_LABEL = 'api'
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 AUTH_USER_MODEL = 'account.BaseUser'  # custom user model
-LOGIN_URL = '/u/login'
+LOGIN_URL = f'/{API_URL_LABEL}/{API_VERSION}/account/login'
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
@@ -146,6 +146,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.MultiPartParser',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
 }
 
 SIMPLE_JWT = {

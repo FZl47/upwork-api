@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import ClientUser, FreelancerUser, SuperUser
+from .models import ClientUser, FreelancerUser, SuperUser, BaseUser
+
+admin.site.register(BaseUser)
 
 
 @admin.register(ClientUser)

@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.auth.hashers import make_password
 
 from model_utils.managers import InheritanceManager
 
@@ -27,12 +26,15 @@ class UserManagerCustom(UserManager, InheritanceManager):
         """
         if not username:
             raise ValueError("The given username must be set")
+
+        extra_fields.setdefault('is_active', True)
+
         email = self.normalize_email(email)
-        username = BaseModel.normalize_username(username)
+        username = AbstractUser.normalize_username(username)
         model = self._get_model_to_create(role=role)
         user = model(username=username, email=email, **extra_fields)
-        user.password = make_password(password)
-        user.save(using=self._db)
+        user.set_password(password)
+        user.save()
         return user
 
     def create_user(self, username, email=None, password=None, role=None, **extra_fields):
@@ -73,9 +75,18 @@ class BaseUser(BaseModel, AbstractUser):
 class ClientUser(BaseUser):
     role = models.CharField(max_length=10, default='client', editable=False)
 
+    def get_projects(self):
+        return self.project_set.all()
+
 
 class FreelancerUser(BaseUser):
     role = models.CharField(max_length=12, default='freelancer', editable=False)
+
+    def get_proposals(self):
+        return self.proposal_set.all()
+
+    def get_accepted_proposals(self):
+        return self.get_proposals().filter(status='accepted')
 
 
 class SuperUser(BaseUser):

@@ -5,8 +5,12 @@ from drf_yasg.utils import swagger_auto_schema
 
 
 def swagger_schema(*args, **kwargs):
-    def decorator(f):
-        swagger_auto_schema(*args, **kwargs)(f)
+    """
+        TODO: There is a bug in the default method of using generic views that needs to be fixed(methods not unique).
+    """
+
+    def decorator(klass, f):
+        # swagger_auto_schema(*args, **kwargs)(f)
 
         @functools.wraps(f)
         def wrapper(*viewargs, **viewkw):
@@ -88,7 +92,6 @@ class SwaggerViewMixin(abc.ABC):
         view = _get_view or _post_view or _put_view or _delete_view
         if not view:
             raise AttributeError('You must define one of http methods')
-
         additional_context = {}
         if view == _get_view:
             additional_context['query_serializer'] = cls.swagger_serializer or cls.serializer
@@ -98,4 +101,4 @@ class SwaggerViewMixin(abc.ABC):
         swagger_schema(operation_id=cls.swagger_title, operation_description=cls.swagger_description,
                        security=cls._security,
                        responses=cls._responses,
-                       tags=cls.swagger_tags, **additional_context)(view)
+                       tags=cls.swagger_tags, **additional_context)(cls, view)
